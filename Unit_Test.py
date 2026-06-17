@@ -32,7 +32,7 @@ class TestChessEngine(unittest.TestCase):
         board = self._load_board("mate_in_1.txt")
         self.assertTrue(validate_board(board))
         result = iddfs(board, max_depth = 3, is_white_start =True)
-        self.assertIsNone(result)
+        self.assertIsNotNone(result)
 
         depth, move = result
         self.assertEqual(depth, 1)
@@ -44,9 +44,9 @@ class TestChessEngine(unittest.TestCase):
         board = self._load_board("mate_in_2.txt")
         self.assertTrue(validate_board(board))
         result = iddfs(board, max_depth = 4, is_white_start =True)
-        self.assertIsNone(result)
+        self.assertIsNotNone(result)
         depth, move = result
-        self.assertEqual(depth, 2)
+        self.assertEqual(depth, 3)
 
     def test_mate_in_3(self):
         """
@@ -54,10 +54,10 @@ class TestChessEngine(unittest.TestCase):
         """
         board = self._load_board("mate_in_3.txt")
         self.assertTrue(validate_board(board))
-        result = iddfs(board, max_depth = 4, is_white_start =True)
-        self.assertIsNone(result)
+        result = iddfs(board, max_depth = 6, is_white_start =True)
+        self.assertIsNotNone(result)
         depth, move = result
-        self.assertEqual(depth, 3)
+        self.assertEqual(depth, 5)
 
 if __name__ == '__main__':
     unittest.main()

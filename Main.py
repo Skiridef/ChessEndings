@@ -26,7 +26,7 @@ def read_board(filepath):
 def validate_board(board):
     """
     Validates that the board is valid
-    :param board: an 8x8 matrix of the board
+    :param board: a 8x8 matrix of the board
     :return: True if the board is valid, False otherwise
     """
     if len(board) != 8:
@@ -59,7 +59,7 @@ def validate_board(board):
 def get_pseudo_legal_moves(board, row, col):
     """
     Generates a list of all possible moves that can be made
-    :param board: an 8x8 matrix of the board
+    :param board: a 8x8 matrix of the board
     :param row: current row
     :param col: current column
     :return: list of possible moves
@@ -75,24 +75,24 @@ def get_pseudo_legal_moves(board, row, col):
         while True:
             if not (0 <= current_r < 8 and 0 <= current_c < 8):
                 break
+            target_piece = board[current_r][current_c]
+
+            if target_piece == '.':
+                possible_moves.append(((row, col),(current_r, current_c)))
+                current_r, current_c = current_r + dr, current_c + dc
+            elif target_piece.isupper() != is_white:
+                possible_moves.append(((row, col),(current_r, current_c)))
+                break
             else:
-                target_piece = board[current_r][current_c]
-                if target_piece == '.':
-                    possible_moves.append(((row, col),(current_r, current_c)))
-                    current_r, current_c = current_r + dr, current_c + dc
-                elif target_piece.isupper() != is_white:
-                    possible_moves.append(((row, col),(current_r, current_c)))
-                    break
-                else:
-                    break
-                if piece_type == 'K':
-                    break
+                break
+            if piece_type == 'K':
+                break
     return possible_moves
 
 def is_check(board, is_white):
     """
     Checks if the board is white or black
-    :param board: an 8x8 matrix of the board
+    :param board: a 8x8 matrix of the board
     :param is_white: boolean indicating if the board is white or black
     :return: True if the board is white or black, False otherwise
     """
@@ -107,10 +107,10 @@ def is_check(board, is_white):
             break
     for row in range(8):
         for col in range(8):
-            enemy_pieces = board[row][col]
-            if enemy_pieces == '.':
+            piece = board[row][col]
+            if piece == '.':
                 continue
-            if enemy_pieces.isupper() != is_white:
+            if piece.isupper() != is_white:
                 enemy_moves = get_pseudo_legal_moves(board, row, col)
                 for move in enemy_moves:
                     end_pos = move[1]
@@ -121,7 +121,7 @@ def is_check(board, is_white):
 def get_legal_moves(board, is_white):
     """
     Generates all legal moves that can be made
-    :param board: an 8x8 matrix of the board
+    :param board: a 8x8 matrix of the board
     :param is_white: boolean indicating if the board is white or black
     :return: list of legal moves
     """
@@ -153,7 +153,7 @@ def minimax(board, depth, alpha, beta, is_white, maximizing_player):
     if len(legal_moves) == 0:
         if is_check(board, is_white):
             #Checkmate
-            return -float('inf') if maximizing_player else float('inf')
+            return -1000 if maximizing_player else 1000
         #Stalemate
         return 0
     if depth == 0:
@@ -162,7 +162,7 @@ def minimax(board, depth, alpha, beta, is_white, maximizing_player):
 
     #Recursive function
     if maximizing_player:
-        max_evaluation = -float('inf')
+        max_evaluation = -10000
         for move in legal_moves:
             (start_row, start_col), (end_row, end_col) = move
             #Make move
@@ -181,7 +181,7 @@ def minimax(board, depth, alpha, beta, is_white, maximizing_player):
                 break #Beta pruning
         return max_evaluation
     else:
-        min_evaluation = float('inf')
+        min_evaluation = 10000
         for move in legal_moves:
             (start_row, start_col), (end_row, end_col) = move
             #Make move
@@ -203,7 +203,7 @@ def minimax(board, depth, alpha, beta, is_white, maximizing_player):
 def iddfs(board, max_depth, is_white_start=True):
     """
     Iterative DFS algorithm to find the shortest path to mate
-    :param board: an 8x8 matrix of the board 
+    :param board: a 8x8 matrix of the board
     :param max_depth: maximum depth to search
     :param is_white_start: True if white moves first
     :return: tuple(depth, move) if winning move found, None otherwise
@@ -217,14 +217,14 @@ def iddfs(board, max_depth, is_white_start=True):
             board[end_row][end_col] = board[start_row][start_col]
             board[start_row][start_col] = '.'
             #Call minimax for enemy, in case move is winning - we wait for float('inf')
-            evalution = minimax(board, current_depth - 1, -float('inf'), float('inf'), not is_white_start, False)
+            evalution = minimax(board, current_depth - 1, -10000, 10000, not is_white_start, False)
             #Unmake move
             board[start_row][start_col] = board[end_row][end_col]
             board[end_row][end_col] = captured_piece
             #Check for guaranteed mate
-            if evalution == float('inf'):
+            if evalution == 1000:
                 return current_depth, move
-        return None
+    return None
 
 def format_move(move):
     """
