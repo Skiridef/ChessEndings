@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-from Main import read_board, validate_board, iddfs
+from Main import read_board, validate_board, iddfs, format_move, get_result_message
 
 BASE_DIR = Path(__file__).parent
 
@@ -58,6 +58,26 @@ class TestChessEngine(unittest.TestCase):
         self.assertIsNotNone(result)
         depth, move = result
         self.assertEqual(depth, 5)
+
+    def test_format_move(self):
+        """Checks that matrix coordinates are correctly translated to chess notation
+        """
+        self.assertEqual(format_move(((7, 0), (0, 0))), "from a1 to a8")
+        self.assertEqual(format_move(((4,6), (4,1))), "from g4 to b4")
+
+    def test_output_messages(self):
+        """
+        Checks the exact string outputs for winning and drawing scenarios
+        """
+        board_win = self._load_board("mate_in_1.txt")
+        result_win = iddfs(board_win, max_depth = 3, is_white_start =True)
+        win_msg = get_result_message(board_win, result_win, max_depth = 3)
+        self.assertEqual(win_msg, "Win found in 1 moves. Play: R from a1 to a8")
+
+        board_draw = self._load_board("no_mate.txt")
+        result_draw = iddfs(board_draw, max_depth = 3, is_white_start =True)
+        draw_msg = get_result_message(board_draw, result_draw, max_depth = 3)
+        self.assertEqual(draw_msg, "No forced win found within 3 moves")
 
 if __name__ == '__main__':
     unittest.main()

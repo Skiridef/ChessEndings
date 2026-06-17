@@ -257,6 +257,18 @@ def format_move(move):
     end_square = f"{chr(end_col + 97)}{8 - end_row}"
     return f"from {start_square} to {end_square}"
 
+def get_result_message(board, result, max_depth):
+    """
+    Generates the final output message
+    """
+    if result:
+        depth, winning_move = result
+        piece = board[winning_move[0][0]][winning_move[0][1]]
+        move_str = format_move(winning_move)
+        return f"Win found in {depth} moves. Play: {piece} {move_str}"
+    else:
+        return f"No forced win found within {max_depth} moves"
+
 if __name__ == '__main__':
     filepath = sys.argv[1] if len(sys.argv) > 1 else "board.txt"
     max_search_depth = 5
@@ -268,13 +280,8 @@ if __name__ == '__main__':
     if validate_board(my_board):
         print(f"Searching for forced mate up to depth {max_search_depth} plies (half-moves)...")
         result = iddfs(my_board, max_search_depth, is_white_start=True)
-        if result:
-            depth, winning_move = result
-            piece = my_board[winning_move[0][0]][winning_move[0][1]]
-            move_str = format_move(winning_move)
-            print(f"Win found in {depth} moves! Play: {piece} {move_str}")
-        else:
-            print(f"No forced win found within {max_search_depth} moves")
+        final_message = get_result_message(my_board, result, max_search_depth)
+        print(final_message)
     else:
         print("Engine stopped due to invalid board")
 
