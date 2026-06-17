@@ -239,12 +239,12 @@ def iddfs(board, max_depth, is_white_start=True):
             board[end_row][end_col] = board[start_row][start_col]
             board[start_row][start_col] = '.'
             #Call minimax for enemy, in case move is winning - we wait for float('inf')
-            evalution = minimax(board, current_depth - 1, float('-inf'), float('inf'), not is_white_start, False)
+            evaluation = minimax(board, current_depth - 1, float('-inf'), float('inf'), not is_white_start, False)
             #Unmake move
             board[start_row][start_col] = board[end_row][end_col]
             board[end_row][end_col] = captured_piece
             #Check for guaranteed mate
-            if evalution == Mate_score:
+            if evaluation == Mate_score:
                 return current_depth, move
     return None
 
