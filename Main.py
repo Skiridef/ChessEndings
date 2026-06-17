@@ -7,6 +7,7 @@ DIRECTIONS = {
     'R': [(-1, 0), (1, 0), (0, -1), (0, 1)]
 }
 
+Mate_score = 1000
 
 def read_board(filepath):
     """
@@ -105,17 +106,38 @@ def is_check(board, is_white):
                 break
         if king_pos:
             break
-    for row in range(8):
-        for col in range(8):
-            piece = board[row][col]
-            if piece == '.':
-                continue
-            if piece.isupper() != is_white:
-                enemy_moves = get_pseudo_legal_moves(board, row, col)
-                for move in enemy_moves:
-                    end_pos = move[1]
-                    if end_pos == king_pos:
-                        return True
+    if not king_pos:
+        return False
+
+    k_row, k_col = king_pos
+
+    straight_enemies = {'r', 'q'} if is_white else {'R', 'Q'}
+    for dr, dc in DIRECTIONS['R']:
+        r, c = k_row + dr, k_col + dc
+        while 0 <= r < 8 and 0 <= c < 8:
+            piece = board[r][c]
+            if piece != '.':
+                if piece in straight_enemies:
+                    return True
+                break
+            r, c = r + dr, c + dc
+
+    diagonal_enemies = {'b', 'q'} if is_white else {'B', 'Q'}
+    for dr, dc in DIRECTIONS['B']:
+        r, c = k_row + dr, k_col + dc
+        while 0 <= r < 8 and 0 <= c < 8:
+            piece = board[r][c]
+            if piece != '.':
+                if piece in diagonal_enemies:
+                    return True
+                break
+            r, c = r + dr, c + dc
+
+    enemy_king = 'k' if is_white else 'K'
+    for dr, dc in DIRECTIONS['K']:
+        r, c = k_row + dr, k_col + dc
+        if 0 <= r < 8 and 0 <= c < 8 and board[r][c] == enemy_king:
+            return True
     return False
 
 def get_legal_moves(board, is_white):
@@ -153,7 +175,7 @@ def minimax(board, depth, alpha, beta, is_white, maximizing_player):
     if len(legal_moves) == 0:
         if is_check(board, is_white):
             #Checkmate
-            return -1000 if maximizing_player else 1000
+            return -Mate_score if maximizing_player else Mate_score
         #Stalemate
         return 0
     if depth == 0:
@@ -162,7 +184,7 @@ def minimax(board, depth, alpha, beta, is_white, maximizing_player):
 
     #Recursive function
     if maximizing_player:
-        max_evaluation = -10000
+        max_evaluation = float('-inf')
         for move in legal_moves:
             (start_row, start_col), (end_row, end_col) = move
             #Make move
@@ -181,7 +203,7 @@ def minimax(board, depth, alpha, beta, is_white, maximizing_player):
                 break #Beta pruning
         return max_evaluation
     else:
-        min_evaluation = 10000
+        min_evaluation = float('inf')
         for move in legal_moves:
             (start_row, start_col), (end_row, end_col) = move
             #Make move
@@ -217,12 +239,12 @@ def iddfs(board, max_depth, is_white_start=True):
             board[end_row][end_col] = board[start_row][start_col]
             board[start_row][start_col] = '.'
             #Call minimax for enemy, in case move is winning - we wait for float('inf')
-            evalution = minimax(board, current_depth - 1, -10000, 10000, not is_white_start, False)
+            evalution = minimax(board, current_depth - 1, float('-inf'), float('inf'), not is_white_start, False)
             #Unmake move
             board[start_row][start_col] = board[end_row][end_col]
             board[end_row][end_col] = captured_piece
             #Check for guaranteed mate
-            if evalution == 1000:
+            if evalution == Mate_score:
                 return current_depth, move
     return None
 
@@ -244,7 +266,7 @@ if __name__ == '__main__':
         print("File not found")
         sys.exit(1)
     if validate_board(my_board):
-        print(f"Searching for forced mate up to depth {max_search_depth} moves deep...")
+        print(f"Searching for forced mate up to depth {max_search_depth} plies (half-moves)...")
         result = iddfs(my_board, max_search_depth, is_white_start=True)
         if result:
             depth, winning_move = result
@@ -252,7 +274,7 @@ if __name__ == '__main__':
             move_str = format_move(winning_move)
             print(f"Win found in {depth} moves! Play: {piece} {move_str}")
         else:
-            print(f"No forced win found within {max_search_depth} moves!")
+            print(f"No forced win found within {max_search_depth} moves")
     else:
         print("Engine stopped due to invalid board")
 
