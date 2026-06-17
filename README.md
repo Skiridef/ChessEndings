@@ -21,9 +21,9 @@ Initially, Breadth-First Search (BFS) was considered because it naturally finds 
 IDDFS with Minimax perfectly resolves these issues. It maintains the memory efficiency of a Depth-First Search while guaranteeing that the shortest path to victory is found (replicating the primary benefit of BFS). Furthermore, the Minimax logic accurately simulates an opponent trying to delay or prevent the win.
 
 ## 4. Program Structure & Data
-*   **Board Representation:** (e.g., A 2D array / list of lists, or a 1D array, or a custom class).
-*   **Move Generation:** (e.g., A function that generates all legal pseudo-moves and filters out moves that leave the King in check).
-*   **Search Function:** The IDDFS/Minimax recursive function. 
+*   **Board Representation:** The chessboard is represented as a 2D list (an 8x8 matrix) containing strings for empty squares (`.`) and pieces (`K`, `Q`, `R`, `B`, `k`, `q`, `r`, `b`).
+*   **Move Generation:** Handled by `get_pseudo_legal_moves` (which generates all geometrically possible moves based on directional vectors) and filtered by `get_legal_moves`. The latter simulates each move and utilizes an optimized `is_check` function to ensure the king is not left in check.
+*   **Search Function:** Implemented via `iddfs()` as the outer iterative loop, which progressively increases the depth and drives the recursive `minimax()` function with Alpha-Beta pruning to find the optimal defensive or offensive paths.
 
 ## 5. Input Data Representation
 
@@ -53,11 +53,14 @@ The program will print the result directly to the console.
 
 ## 7. Test Cases
 
-To verify the correct behavior of the program, the following test cases are provided in the `tests/` folder:
-1.  **Test 1 (Mate in 1):** A simple King and Queen vs. King scenario where white can checkmate in exactly 1 move. Verifies basic checkmate detection.
-2.  **Test 2 (Mate in 3):** A more complex scenario requiring IDDFS to search deeper while avoiding stalemates.
-3.  **Test 3 (Unwinnable / Draw):** A position where white cannot force a win within 5 moves. Verifies that the program stops correctly and does not crash or loop infinitely.
+To verify the correct behavior of the program, the following test cases are provided in the project root directory and executed via the test suite:
+1.  **Invalid Board Validation (`invalid_board.txt`):** Contains an illegal piece (`p` for pawn) and irregular row lengths. Verifies that the validation logic properly flags corrupted input and stops the engine.
+2.  **Unwinnable / Draw (`no_mate.txt`):** A position where White cannot force a win within the search limit. Verifies that the program exits correctly and returns `None` instead of looping infinitely.
+3.  **Mate in 1 (`mate_in_1.txt`):** A simple King and Rook vs. King scenario where White can checkmate in exactly 1 move (depth 1). Verifies basic checkmate detection.
+4.  **Mate in 2 (`mate_in_2.txt`):** A ladder mate setup with two Rooks requiring a 2-move forced sequence (found at depth 3 plies). Verifies the adversarial Minimax logic against optimal defense.
+5.  **Mate in 3 (`mate_in_3.txt`):** A deeper ladder mate setup requiring a 3-move sequence (found at depth 5 plies). Verifies that IDDFS correctly finds the shortest path to checkmate.
 
-## 8. Final Sigh
-
-The transition from planning to use BFS to actually implementing Minimax with IDDFS was the most challenging part of this project. Modeling the opponent's legal moves and handling edge cases like stalemate required significant debugging. However, it was highly rewarding to see the algorithm successfully solve complex endgames without running out of memory.
+## 8. How to Run Tests
+You can execute the built-in test suite directly from the terminal using Python's `unittest` module:
+```bash
+python -m unittest Unit_Test.py
