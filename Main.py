@@ -265,9 +265,10 @@ def get_result_message(board, result, max_depth):
         depth, winning_move = result
         piece = board[winning_move[0][0]][winning_move[0][1]]
         move_str = format_move(winning_move)
-        return f"Win found in {depth} moves. Play: {piece} {move_str}"
+        full_moves = (depth + 1) // 2
+        return f"Win found in {full_moves} moves (depth: {depth}). Play: {piece} {move_str}"
     else:
-        return f"No forced win found within {max_depth} moves"
+        return f"No forced win found within {max_depth} plies"
 
 if __name__ == '__main__':
     filepath = sys.argv[1] if len(sys.argv) > 1 else "board.txt"

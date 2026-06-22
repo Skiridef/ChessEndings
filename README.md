@@ -25,6 +25,19 @@ IDDFS with Minimax perfectly resolves these issues. It maintains the memory effi
 *   **Move Generation:** Handled by `get_pseudo_legal_moves` (which generates all geometrically possible moves based on directional vectors) and filtered by `get_legal_moves`. The latter simulates each move and utilizes an optimized `is_check` function to ensure the king is not left in check.
 *   **Search Function:** Implemented via `iddfs()` as the outer iterative loop, which progressively increases the depth and drives the recursive `minimax()` function with Alpha-Beta pruning to find the optimal defensive or offensive paths.
 
+### Core Functions Description
+The logic in `Main.py` is divided into the following key functions:
+
+* **`read_board(filepath)`**: Reads the text file and converts it into an 8x8 matrix.
+* **`validate_board(board)`**: Checks if the input board has the correct dimensions (8x8), contains only allowed characters, and has exactly one King of each color.
+* **`get_pseudo_legal_moves(board, row, col)`**: Generates all geometrically possible moves for a piece based on its directional vectors, without considering if the move leaves the King in check.
+* **`is_check(board, is_white)`**: Uses an optimized ray-casting method starting from the King's position to detect if it is currently under attack by enemy pieces.
+* **`get_legal_moves(board, is_white)`**: Filters the pseudo-legal moves by simulating each move on the board and verifying (using `is_check`) that it does not result in a self-check.
+* **`minimax(board, depth, alpha, beta, is_white, maximizing_player)`**: The core adversarial search function evaluating positions using Alpha-Beta pruning to simulate both the attacker's best moves and the defender's optimal resistance.
+* **`iddfs(board, max_depth, is_white_start=True)`**: The outer Iterative Deepening Depth-First Search loop. It progressively increases the search limit and calls `minimax` to guarantee finding the shortest possible path to checkmate.
+* **`format_move(move)`**: A helper function that translates matrix coordinates (e.g., `(7,0)` to `(0,0)`) into standard chess algebraic notation (e.g., `a1` to `a8`).
+* **`get_result_message(board, result, max_depth)`**: Constructs the final human-readable string to be printed to the console based on the algorithm's result.
+
 ## 5. Input Data Representation
 
 The input is provided via a plain text file containing an 8x8 matrix representing the chessboard.
@@ -65,3 +78,10 @@ You can execute the built-in test suite directly from the terminal using Python'
 ```bash
 python -m unittest Unit_Test.py
 ```
+
+## 9. How to Run the program
+You can run the main program from the terminal by passing the path to the board file as an argument.
+```bash
+python Main.py mate_in_1.txt
+```
+If no file is specified, the program will look for a default **`board.txt`** file in the same directory.
