@@ -72,12 +72,12 @@ class TestChessEngine(unittest.TestCase):
         board_win = self._load_board("mate_in_1.txt")
         result_win = iddfs(board_win, max_depth = 3, is_white_start =True)
         win_msg = get_result_message(board_win, result_win, max_depth = 3)
-        self.assertEqual(win_msg, "Win found in 1 moves. Play: R from a1 to a8")
+        self.assertEqual(win_msg, "Win found in 1 moves (depth: 1). Play: R from a1 to a8")
 
         board_draw = self._load_board("no_mate.txt")
         result_draw = iddfs(board_draw, max_depth = 3, is_white_start =True)
         draw_msg = get_result_message(board_draw, result_draw, max_depth = 3)
-        self.assertEqual(draw_msg, "No forced win found within 3 moves")
+        self.assertEqual(draw_msg, "No forced win found within 3 plies")
 
 if __name__ == '__main__':
     unittest.main()
